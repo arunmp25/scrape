@@ -1,0 +1,37 @@
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.mock.http.client.MockClientHttpResponse;
+import org.springframework.web.client.HttpClientErrorException;
+
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+public class CustomResponseErrorHandlerTest {
+
+    @Test
+    public void testHandleErrorWithNotFoundStatus() throws IOException {
+        CustomResponseErrorHandler errorHandler = new CustomResponseErrorHandler();
+
+        // Create a mock ClientHttpResponse with 404 status
+        ClientHttpResponse response = new MockClientHttpResponse(new byte[0], HttpStatus.NOT_FOUND);
+
+        // Call handleError and verify the custom error handling logic
+        assertThrows(HttpClientErrorException.NotFound.class, () -> errorHandler.handleError(response));
+        // Add additional assertions or custom error handling logic verification as needed
+    }
+
+    @Test
+    public void testHandleErrorWithOtherStatus() throws IOException {
+        CustomResponseErrorHandler errorHandler = new CustomResponseErrorHandler();
+
+        // Create a mock ClientHttpResponse with 500 status
+        ClientHttpResponse response = new MockClientHttpResponse(new byte[0], HttpStatus.INTERNAL_SERVER_ERROR);
+
+        // Call handleError and verify that it delegates to the default handling
+        assertThrows(HttpClientErrorException.InternalServerError.class, () -> errorHandler.handleError(response));
+        // Add additional assertions or default error handling verification as needed
+    }
+}
