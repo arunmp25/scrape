@@ -1,0 +1,16 @@
+ArgumentCaptor<String> headerNameCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> headerValueCaptor = ArgumentCaptor.forClass(String.class);
+        verify(mockRequest.getHeaders()).add(headerNameCaptor.capture(), headerValueCaptor.capture());
+        assertEquals("message-id", headerNameCaptor.getValue());
+        assertNotNull(headerValueCaptor.getValue());
+
+        verify(mockRequest, times(2)).getMethod();
+        verify(mockRequest, times(2)).getURI();
+        verify(mockRequest, times(2)).getHeaders();
+        verify(mockResponse).getStatusCode();
+        verify(mockResponse).getHeaders();
+        verify(mockResponse).getBody();
+
+        // Add additional assertions as needed
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Response body", IOUtils.toString(response.getBody(), StandardCharsets.UTF_8));
