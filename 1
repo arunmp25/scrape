@@ -1,0 +1,35 @@
+     // Create a mock response for testing
+        ClientHttpResponse mockResponse = mock(ClientHttpResponse.class);
+        when(mockResponse.getStatusCode()).thenReturn(HttpStatus.OK);
+        when(mockResponse.getBody()).thenReturn(IOUtils.toInputStream("Response body", StandardCharsets.UTF_8));
+
+        // Create a mock request for testing
+        ClientHttpRequest mockRequest = mock(ClientHttpRequest.class);
+        when(mockRequest.getMethod()).thenReturn(HttpMethod.GET);
+        when(mockRequest.getURI()).thenReturn(new URI("http://example.com"));
+        HttpHeaders requestHeaders = new HttpHeaders();
+        when(mockRequest.getHeaders()).thenReturn(requestHeaders);
+        when(mockRequest.execute()).thenReturn(mockResponse);
+
+        // Execute the interceptor
+        ClientHttpRequestInterceptor interceptor = interceptors.get(0);
+        ClientHttpResponse response = interceptor.intercept(mockRequest, "Request body".getBytes(), mock(ClientHttpRequestExecution.class));
+
+        // Verify the interceptor behavior
+        verify(mockRequest.getHeaders()).add(eq("message-id"), anyString());
+        verify(mockRequest, times(2)).getMethod();
+        verify(mockRequest, times(2)).getURI();
+        verify(mockRequest, times(2)).getHeaders();
+        verify(mockResponse).getStatusCode();
+        verify(mockResponse).getHeaders();
+        verify(mockResponse).getBody();
+
+        // Assert the "message-id" header value
+        assertEquals(1, requestHeaders.size());
+        assertTrue(requestHeaders.containsKey("message-id"));
+        assertNotNull(requestHeaders.getFirst("message-id"));
+
+        // Add additional assertions as needed
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Response body", IOUtils.toString(response.getBody(), StandardCharsets.UTF_8));
+    }
